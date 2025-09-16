@@ -1,0 +1,11 @@
+helm repo add kong https://charts.konghq.com
+helm repo update
+
+helm upgrade --install kong kong/kong \
+  --namespace kong --create-namespace \
+  -f values.yaml
+
+
+
+kubectl get pods -n kong
+kubectl get svc -n kong
