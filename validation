@@ -1,0 +1,102 @@
+Configure kubectl
+
+Download kubeconfig for EKS:
+
+aws eks --region us-east-1 update-kubeconfig --name polaris-eks-cluster
+kubectl get nodes
+
+
+✅ You should see worker nodes in Ready state.
+
+ Validate Jenkins
+
+Check pods:
+
+kubectl get pods -n jenkins
+
+
+✅ Jenkins pod must be Running.
+
+Get Jenkins initial admin password:
+
+kubectl exec -it -n jenkins deploy/jenkins -- cat /var/jenkins_home/secrets/initialAdminPassword
+
+
+Open Jenkins via Kong Ingress: http://jenkins.polaris.com
+
+ Validate Kong
+
+Get Kong proxy IP:
+
+kubectl get svc -n kong kong-proxy
+
+
+✅ Ensure EXTERNAL-IP is available.
+
+Test Kong Ingress controller:
+
+curl -i http://<KONG_EXTERNAL_IP>
+
+Deploy API via Jenkins Pipeline
+
+Push code to GitHub repo.
+
+Webhook triggers Jenkins pipeline.
+
+Jenkins builds image → pushes to ECR → runs helm upgrade.
+
+Validate API pod:
+
+kubectl get pods -n default
+
+
+Validate service:
+
+kubectl get svc -n default
+
+Access API via Kong
+
+Since we defined:
+
+host: api.polaris.com
+
+
+Update your /etc/hosts (Linux/Mac) or C:\Windows\System32\drivers\etc\hosts (Windows):
+
+<KONG_EXTERNAL_IP> api.polaris.com
+
+
+Now test API:
+
+curl http://api.polaris.com/health
+
+
+✅ You should get response from your deployed API.
+
+Validate Auto Trigger
+
+Commit a small change to API code.
+
+Jenkins should auto-trigger via webhook.
+
+After pipeline finishes, check pod image:
+
+kubectl describe pod <api-pod> | grep Image
+
+
+✅ Image tag should match Jenkins build number.
+
+🔧 Troubleshooting Quick Guide
+
+Pods CrashLoopBackOff → check logs
+
+kubectl logs <pod> -n default
+
+
+Ingress not routing → verify Kong annotations, and DNS mapping in /etc/hosts.
+
+Pipeline fails at ECR login → ensure Jenkins has AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY configured.
+
+Helm upgrade fails → run with debug
+
+helm upgrade --install polaris-api ./helm-charts/api-chart --debug
