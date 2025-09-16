@@ -6,7 +6,7 @@ resource "aws_vpc" "demo" {
 
 resource "aws_subnet" "public" {
   count                   = length(var.public_subnets)
-  vpc_id                  = aws_vpc.this.id
+  vpc_id                  = aws_vpc.demo.id
   cidr_block              = var.public_subnets[count.index]
   availability_zone       = var.azs[count.index]
   map_public_ip_on_launch = true
@@ -19,12 +19,12 @@ resource "aws_subnet" "private" {
   availability_zone = var.azs[count.index]
 }
 
-resource "aws_internet_gateway" "this" {
-  vpc_id = aws_vpc.this.id
+resource "aws_internet_gateway" "demo" {
+  vpc_id = aws_vpc.demo.id
 }
 
 output "vpc_id" {
-  value = aws_vpc.this.id
+  value = aws_vpc.demo.id
 }
 
 output "public_subnets" {
