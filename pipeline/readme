@@ -1,0 +1,25 @@
+Checkout code from GitHub
+
+Build Docker image
+
+Push image to ECR (or DockerHub)
+
+Deploy API using Helm chart to EKS
+
+Expose via Kong automatically
+
+-----------------------------------------------------------
+
+Triggering on Code Change
+In GitHub, set up a Webhook → Jenkins URL /github-webhook/ → triggers this pipeline automatically.
+Add this in Jenkins job config:
+
+Build Triggers → GitHub hook trigger for GITScm polling
+
+Helm Upgrade ensures:
+
+First deployment → installs chart
+
+Next deployments → update with new Docker tag
+
+Kong ingress ensures API is exposed at http://api.polaris.com
