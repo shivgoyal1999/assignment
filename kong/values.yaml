@@ -1,0 +1,27 @@
+ingressController:
+  enabled: true
+  installCRDs: true
+
+env:
+  database: "off"   # Using DB-less mode (declarative config)
+
+proxy:
+  type: LoadBalancer
+  http:
+    enabled: true
+    servicePort: 80
+  tls:
+    enabled: false
+
+admin:
+  enabled: true
+  type: ClusterIP
+  http:
+    enabled: true
+    servicePort: 8001
+
+# Make it resilient
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 5
