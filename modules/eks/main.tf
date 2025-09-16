@@ -1,4 +1,4 @@
-resource "aws_eks_cluster" "this" {
+resource "aws_eks_cluster" "demo" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_cluster.arn
 
@@ -28,9 +28,9 @@ resource "aws_iam_role_policy_attachment" "eks_policy" {
 }
 
 output "cluster_name" {
-  value = aws_eks_cluster.this.name
+  value = aws_eks_cluster.demo.name
 }
 
 output "cluster_endpoint" {
-  value = aws_eks_cluster.this.endpoint
+  value = aws_eks_cluster.demo.endpoint
 }
