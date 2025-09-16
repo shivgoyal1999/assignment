@@ -1,0 +1,26 @@
+replicaCount: 2
+
+image:
+  repository: <your-docker-repo>/<your-api>
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: kong
+  host: api.polaris.com
+  path: /
+  pathType: Prefix
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
