@@ -2,9 +2,6 @@ ingressController:
   enabled: true
   installCRDs: true
 
-env:
-  database: "off"   # Using DB-less mode (declarative config)
-
 proxy:
   type: LoadBalancer
   http:
@@ -20,7 +17,6 @@ admin:
     enabled: true
     servicePort: 8001
 
-# Make it resilient
 autoscaling:
   enabled: true
   minReplicas: 2
