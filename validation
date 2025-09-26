@@ -70,14 +70,15 @@ Now test API:
 curl http://api.polaris.com/health
 
 
-✅ You should get response from your deployed API.
-
 Validate Auto Trigger
 
 Commit a small change to API code.
 
 Jenkins should auto-trigger via webhook.
-
+I configured GitHub Webhooks to trigger Jenkins automatically on code changes. 
+The webhook points to Jenkins /github-webhook/, and the Jenkins pipeline is set with the GitHub SCM trigger.
+So every git push triggers a pipeline run that builds the Docker image, pushes it to ECR, and redeploys via Helm.
+This ensures fully automated CI/CD without manual intervention.”
 After pipeline finishes, check pod image:
 
 kubectl describe pod <api-pod> | grep Image
