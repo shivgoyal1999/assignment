@@ -1,3 +1,4 @@
+kubectl get svc -n kong kong-proxy -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
 
 
 aws eks --region us-east-1 update-kubeconfig --name polaris-eks-cluster
