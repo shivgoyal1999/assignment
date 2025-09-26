@@ -18,3 +18,26 @@ spec:
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
           - containerPort: {{ .Values.service.targetPort }}
+            readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: 30
+          periodSeconds: 20
+        imagePullSecrets:
+        {{- if .Values.image.pullSecrets }}
+          - name: {{ .Values.image.pullSecrets }}
+        {{- end }}
+        resources:
+          requests:
+            cpu: {{ .Values.resources.requests.cpu }}
+            memory: {{ .Values.resources.requests.memory }}
+          limits:
+            cpu: {{ .Values.resources.limits.cpu }}
+            memory: {{ .Values.resources.limits.memory }}
