@@ -1,12 +1,10 @@
-Configure kubectl
 
-Download kubeconfig for EKS:
 
 aws eks --region us-east-1 update-kubeconfig --name polaris-eks-cluster
 kubectl get nodes
 
 
-✅ You should see worker nodes in Ready state.
+You should see worker nodes in Ready state.
 
  Validate Jenkins
 
@@ -15,7 +13,7 @@ Check pods:
 kubectl get pods -n jenkins
 
 
-✅ Jenkins pod must be Running.
+jenkins pod must be Running.
 
 Get Jenkins initial admin password:
 
@@ -31,7 +29,7 @@ Get Kong proxy IP:
 kubectl get svc -n kong kong-proxy
 
 
-✅ Ensure EXTERNAL-IP is available.
+Ensure EXTERNAL-IP is available.
 
 Test Kong Ingress controller:
 
@@ -84,19 +82,7 @@ After pipeline finishes, check pod image:
 kubectl describe pod <api-pod> | grep Image
 
 
-✅ Image tag should match Jenkins build number.
-
-🔧 Troubleshooting Quick Guide
-
-Pods CrashLoopBackOff → check logs
-
-kubectl logs <pod> -n default
+Image tag should match Jenkins build number.
 
 
-Ingress not routing → verify Kong annotations, and DNS mapping in /etc/hosts.
 
-Pipeline fails at ECR login → ensure Jenkins has AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY configured.
-
-Helm upgrade fails → run with debug
-
-helm upgrade --install polaris-api ./helm-charts/api-chart --debug
