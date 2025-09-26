@@ -4,6 +4,8 @@ metadata:
   name: jenkins
   namespace: jenkins
 ---
+
+if your cluster level permission
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
