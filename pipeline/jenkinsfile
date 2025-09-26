@@ -1,15 +1,14 @@
 pipeline {
     agent any
-
     environment {
         AWS_REGION = "us-east-1"
-        ECR_REPO   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/polaris-api"
         CLUSTER    = "polaris-eks-cluster"
+        ECR_REPO   = "123456789012.dkr.ecr.us-east-1.amazonaws.com/polaris-api"
         CHART_PATH = "helm-charts/api-chart"
     }
 
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', url: 'https://github.com/your-org/your-api.git'
             }
@@ -17,51 +16,38 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    sh 'docker build -t $ECR_REPO:$BUILD_NUMBER .'
-                }
+                sh 'docker build -t $ECR_REPO:$BUILD_NUMBER .'
             }
         }
 
-        stage('Login to ECR') {
+        stage('Push to ECR') {
             steps {
-                script {
-                    sh '''
-                    aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REPO
-                    '''
-                }
+                sh '''
+                aws ecr get-login-password --region $AWS_REGION | \
+                docker login --username AWS --password-stdin $ECR_REPO
+                docker push $ECR_REPO:$BUILD_NUMBER
+                '''
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Configure kubeconfig') {
             steps {
-                script {
-                    sh 'docker push $ECR_REPO:$BUILD_NUMBER'
-                }
+                sh '''
+                aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER
+                '''
             }
         }
 
         stage('Deploy with Helm') {
             steps {
-                script {
-                    sh '''
-                    helm upgrade --install polaris-api $CHART_PATH \
-                        --namespace default \
-                        --set image.repository=$ECR_REPO \
-                        --set image.tag=$BUILD_NUMBER \
-                        --set ingress.host=api.polaris.com
-                    '''
-                }
+                sh '''
+                helm upgrade --install polaris-api $CHART_PATH \
+                  --namespace default \
+                  --set image.repository=$ECR_REPO \
+                  --set image.tag=$BUILD_NUMBER \
+                  --set ingress.host=api.polaris.com
+                '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo "✅ Deployment successful. Access API via Kong at http://api.polaris.com"
-        }
-        failure {
-            echo "❌ Deployment failed. Check Jenkins logs."
         }
     }
 }
